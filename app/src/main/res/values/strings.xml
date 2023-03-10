@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">NumberFact</string>
+    <string name="get_fact">Get Fact</string>
+    <string name="get_random_fact">Get random fact</string>
+</resources>
