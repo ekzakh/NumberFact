@@ -9,7 +9,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
-class NumbersViewModelTest {
+class NumbersViewModelTest : BaseTest(){
 
     private lateinit var communications: TestNumbersCommunications
     private lateinit var interactor: TestNumbersInteractor
@@ -122,31 +122,7 @@ class NumbersViewModelTest {
         assertEquals(NumberUi("89", "Fact about 89"), communications.numbersList[0])
     }
 
-    class TestNumbersCommunications : NumbersCommunications {
-        val progressCalledList = mutableListOf<Boolean>()
-        val stateCalledList = mutableListOf<UiState>()
-        val numbersList = mutableListOf<NumberUi>()
-        var showListCalled = 0
 
-        override fun shopProgress(show: Boolean) {
-            progressCalledList.add(true)
-        }
-
-        override fun showState(uiState: UiState) {
-            stateCalledList.add(uiState)
-        }
-
-        override fun showList(list: List<NumberUi>) {
-            showListCalled++
-            numbersList.addAll(list)
-        }
-
-        override fun observeProgress(owner: LifecycleOwner, observer: Observer<Boolean>) = Unit
-
-        override fun observeState(owner: LifecycleOwner, observer: Observer<UiState>) = Unit
-
-        override fun observeNumbersList(owner: LifecycleOwner, observer: Observer<List<NumberUi>>) = Unit
-    }
 
     private class TestNumbersInteractor : NumbersInteractor {
 

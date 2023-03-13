@@ -11,9 +11,8 @@ class NumberResultMapper(
     override fun map(list: List<NumberFact>, errorMessage: String) {
         communications.showState(
             if (errorMessage.isEmpty()) {
-                val numbersList = list.map { it.map(mapperToUi) }
-                if (numbersList.isNotEmpty()) {
-                    communications.showList(numbersList)
+                if (list.isNotEmpty()) {
+                    communications.showList(list.map { it.map(mapperToUi) })
                 }
                 UiState.Success
             } else {
