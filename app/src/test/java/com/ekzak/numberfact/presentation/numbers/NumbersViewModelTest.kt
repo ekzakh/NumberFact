@@ -1,27 +1,47 @@
 package com.ekzak.numberfact.presentation.numbers
 
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
+import com.ekzak.numberfact.domain.NumberFact
+import com.ekzak.numberfact.domain.NumbersInteractor
+import com.ekzak.numberfact.domain.NumberResult
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Test
 
 class NumbersViewModelTest {
+
+    private lateinit var communications: TestNumbersCommunications
+    private lateinit var interactor: TestNumbersInteractor
+    private lateinit var viewModel: NumbersViewModel
+
+    @Before
+    fun init() {
+        communications = TestNumbersCommunications()
+        interactor = TestNumbersInteractor()
+        viewModel = NumbersViewModel(
+            communications,
+            interactor,
+            NumberResultMapper(communications, NumberUiMapper())
+        )
+    }
     /**
      * Initial test
      * At start fetch data and show it
      * then try to get some data successfully
      * then re-init and wait for result
      */
-
+    @Test
     fun `test init and re-init`() {
-        val communications = TestNumbersCommunications()
-        val interactor = TestNumbersInteractor()
-        val viewModel = NumbersViewModel(communications, interactor)
 
         viewModel.init(isFirstRun = true)
-        interactor.changeExpectedResult(NumbersResult.Success())
+        interactor.changeExpectedResult(NumberResult.Success())
 
         //show progress
         assertEquals(1, communications.progressCalledList.size)
         assertEquals(true, communications.progressCalledList[0])
+
+        assertEquals(1, interactor.initCalledList.size)
 
         //hide progress
         assertEquals(2, communications.progressCalledList.size)
@@ -29,12 +49,12 @@ class NumbersViewModelTest {
 
         //result success
         assertEquals(1, communications.stateCalledList.size)
-        assertEquals(UiState.Success(emptyList<NumberFact>()), communications.stateCalledList[0])
+        assertEquals(UiState.Success, communications.stateCalledList[0])
         assertEquals(0, communications.numbersList.size)
         assertEquals(1, communications.showListCalled)
 
         //get random fact with failure
-        interactor.changeExpectedResult(NumbersResult.Failure("No internet connection"))
+        interactor.changeExpectedResult(NumberResult.Failure("No internet connection"))
         viewModel.fetchRandomNumberFact()
         //show progress
         assertEquals(3, communications.progressCalledList.size)
@@ -62,11 +82,8 @@ class NumbersViewModelTest {
      */
     @Test
     fun `test about empty number`() {
-        val communications = TestNumbersCommunications()
-        val interactor = TestNumbersInteractor()
-        val viewModel = NumbersViewModel(communications, interactor)
 
-        viewModel.fetchFact("")
+        viewModel.fetchNumberFact("")
         //show progress
         assertEquals(1, communications.progressCalledList.size)
         assertEquals(true, communications.progressCalledList[0])
@@ -86,12 +103,9 @@ class NumbersViewModelTest {
      */
     @Test
     fun `test about some number`() {
-        val communications = TestNumbersCommunications()
-        val interactor = TestNumbersInteractor()
-        val viewModel = NumbersViewModel(communications, interactor)
 
-        viewModel.fetchFact("89")
-        interactor.changeExpectedResult(NumbersResult.Success(listOf(NumberFact("89", "Fact about 89"))))
+        viewModel.fetchNumberFact("89")
+        interactor.changeExpectedResult(NumberResult.Success(listOf(NumberFact("89", "Fact about 89"))))
         //show progress
         assertEquals(0, communications.progressCalledList.size)
         assertEquals(true, communications.progressCalledList[0])
@@ -103,7 +117,7 @@ class NumbersViewModelTest {
         assertEquals(false, communications.progressCalledList[1])
         //result
         assertEquals(1, communications.stateCalledList.size)
-        assertEquals(UiState.Succes(""), communications.stateCalledList[0])
+        assertEquals(UiState.Success, communications.stateCalledList[0])
         assertEquals(1, communications.showListCalled)
         assertEquals(NumberUi("89", "Fact about 89"), communications.numbersList[0])
     }
@@ -118,42 +132,47 @@ class NumbersViewModelTest {
             progressCalledList.add(true)
         }
 
-        override fun showState(state: UiState) {
-            stateCalledList.add(state)
+        override fun showState(uiState: UiState) {
+            stateCalledList.add(uiState)
         }
 
         override fun showList(list: List<NumberUi>) {
             showListCalled++
             numbersList.addAll(list)
         }
+
+        override fun observeProgress(owner: LifecycleOwner, observer: Observer<Boolean>) = Unit
+
+        override fun observeState(owner: LifecycleOwner, observer: Observer<UiState>) = Unit
+
+        override fun observeNumbersList(owner: LifecycleOwner, observer: Observer<List<NumberUi>>) = Unit
     }
 
     private class TestNumbersInteractor : NumbersInteractor {
 
-        private var result: NumbersResult = NumbersResult.Success()
+        private var result: NumberResult = NumberResult.Success()
 
-        val initCalledList = mutableListOf<NumbersResult>()
-        val fetchNumberFactCalledList = mutableListOf<NumbersResult>()
-        val fetchRandomNumberFactCalledList = mutableListOf<NumbersResult>()
+        val initCalledList = mutableListOf<NumberResult>()
+        val fetchNumberFactCalledList = mutableListOf<NumberResult>()
+        val fetchRandomNumberFactCalledList = mutableListOf<NumberResult>()
 
-        fun changeExpectedResult(newResult: NumbersResult) {
+        fun changeExpectedResult(newResult: NumberResult) {
             result = newResult
         }
 
-        override suspend fun init(): NumbersResult {
+        override suspend fun init(): NumberResult {
             initCalledList.add(result)
             return result
         }
 
-        override suspend fun fetchNumberFact(number: String): NumbersResult {
+        override suspend fun fetchNumberFact(number: String): NumberResult {
             fetchNumberFactCalledList.add(result)
             return result
         }
 
-        override suspend fun fetchRandomNumberFact(): NumbersResult {
+        override suspend fun fetchRandomNumberFact(): NumberResult {
             fetchRandomNumberFactCalledList.add(result)
             return result
         }
-
     }
 }
