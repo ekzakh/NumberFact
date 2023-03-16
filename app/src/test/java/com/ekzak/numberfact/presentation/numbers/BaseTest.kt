@@ -12,7 +12,7 @@ abstract class BaseTest {
         var showListCalled = 0
 
         override fun shopProgress(show: Boolean) {
-            progressCalledList.add(true)
+            progressCalledList.add(show)
         }
 
         override fun showState(uiState: UiState) {
