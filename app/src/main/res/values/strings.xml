@@ -2,4 +2,5 @@
     <string name="app_name">NumberFact</string>
     <string name="get_fact">Get Fact</string>
     <string name="get_random_fact">Get random fact</string>
+    <string name="empty_number_error_message">Please input a number</string>
 </resources>
