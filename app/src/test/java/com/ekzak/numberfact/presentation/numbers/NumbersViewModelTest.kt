@@ -7,24 +7,14 @@ import com.ekzak.numberfact.presentation.ManageResources
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceTimeBy
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TestWatcher
-import org.junit.runner.Description
 
 class NumbersViewModelTest : BaseTest() {
 
@@ -33,6 +23,7 @@ class NumbersViewModelTest : BaseTest() {
     private lateinit var viewModel: NumbersViewModel
     private lateinit var manageResources: TestManageResources
     private lateinit var dispatchersList: TestDispatchersList
+    private lateinit var handleNumbersRequest: HandleNumbersRequest
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
@@ -41,12 +32,16 @@ class NumbersViewModelTest : BaseTest() {
         interactor = TestNumbersInteractor()
         manageResources = TestManageResources()
         dispatchersList = TestDispatchersList()
-        viewModel = NumbersViewModel(
+        handleNumbersRequest = HandleNumbersRequest.Base(
             dispatchersList,
             communications,
+            NumberResultMapper(communications, NumberUiMapper())
+        )
+        viewModel = NumbersViewModel(
+            communications,
             interactor,
-            NumberResultMapper(communications, NumberUiMapper()),
-            manageResources
+            manageResources,
+            handleNumbersRequest
         )
         Dispatchers.setMain(UnconfinedTestDispatcher())
     }
@@ -133,7 +128,10 @@ class NumbersViewModelTest : BaseTest() {
         assertEquals(true, communications.progressCalledList[0])
 
         assertEquals(1, interactor.fetchNumberFactCalledList.size)
-        assertEquals(NumberResult.Success(listOf(NumberFact("89", "Fact about 89"))), interactor.fetchNumberFactCalledList[0])
+        assertEquals(
+            NumberResult.Success(listOf(NumberFact("89", "Fact about 89"))),
+            interactor.fetchNumberFactCalledList[0]
+        )
         //hide progress
         assertEquals(false, communications.progressCalledList[1])
         //result
@@ -184,8 +182,8 @@ class NumbersViewModelTest : BaseTest() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private class TestDispatchersList(
-        private val dispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
-    ): DispatchersList {
+        private val dispatcher: CoroutineDispatcher = UnconfinedTestDispatcher(),
+    ) : DispatchersList {
         override fun io(): CoroutineDispatcher = dispatcher
 
         override fun ui(): CoroutineDispatcher = dispatcher
