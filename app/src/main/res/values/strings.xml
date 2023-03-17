@@ -3,4 +3,6 @@
     <string name="get_fact">Get Fact</string>
     <string name="get_random_fact">Get random fact</string>
     <string name="empty_number_error_message">Please input a number</string>
+    <string name="no_connection_message">No internet connection</string>
+    <string name="service_not_available_message">Service unavailable</string>
 </resources>
