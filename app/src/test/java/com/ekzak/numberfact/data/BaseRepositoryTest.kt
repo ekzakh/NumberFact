@@ -1,6 +1,7 @@
 package com.ekzak.numberfact.data
 
 import com.ekzak.numberfact.domain.NoConnectionException
+import com.ekzak.numberfact.domain.NumberFact
 import com.ekzak.numberfact.domain.NumbersRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -18,7 +19,12 @@ class BaseRepositoryTest {
     fun setUp() {
         cloudDataSource = TestNumbersCloudDataSource()
         cacheDataSource = TestNumbersCacheDataSource()
-        repository = BaseNumbersRepository(cloudDataSource, cacheDataSource)
+        repository = BaseNumbersRepository(
+            cloudDataSource,
+            cacheDataSource,
+            NumberDataToDomain(),
+            HandleDataRequest.Base(HandleDomainError(), cacheDataSource, NumberDataToDomain())
+        )
     }
 
     @Test
@@ -46,14 +52,15 @@ class BaseRepositoryTest {
         cacheDataSource.replaceData(emptyList())
 
         val actual = repository.numberFact("10")
-        val expected = NumberData("10", "fact 10")
+        val expectedInData = NumberFact("10", "fact 10")
+        val expectedInRepo = NumberData("10", "fact 10")
 
-        assertEquals(expected, actual)
+        assertEquals(expectedInData, actual)
         assertEquals(1, cacheDataSource.containsCalledList.size)
         assertEquals(false, cacheDataSource.containsCalledList[0])
         assertEquals(0, cacheDataSource.numberFactCalled.size)
         assertEquals(1, cacheDataSource.saveNumberFactCalledCount)
-        assertEquals(expected, cacheDataSource.data[0])
+        assertEquals(expectedInRepo, cacheDataSource.data[0])
         assertEquals(1, cloudDataSource.numberFactCalledCount)
     }
 
@@ -77,13 +84,13 @@ class BaseRepositoryTest {
         cacheDataSource.replaceData(listOf(NumberData("10", "fact 10")))
 
         val actual = repository.numberFact("10")
-        val expected = NumberData("10", "fact 10")
+        val expected = NumberFact("10", "fact 10")
         assertEquals(expected, actual)
         assertEquals(1, cacheDataSource.containsCalledList.size)
         assertEquals(true, cacheDataSource.containsCalledList[0])
         assertEquals(0, cloudDataSource.numberFactCalledCount)
         assertEquals(1, cacheDataSource.numberFactCalled.size)
-        assertEquals(0, cacheDataSource.saveNumberFactCalledCount)
+        assertEquals(1, cacheDataSource.saveNumberFactCalledCount)
     }
 
     @Test
@@ -92,14 +99,12 @@ class BaseRepositoryTest {
         cacheDataSource.replaceData(emptyList())
 
         val actual = repository.randomNumberFact()
-        val expected = NumberData("10", "fact 10")
+        val expected = NumberFact("10", "fact 10")
 
         assertEquals(expected, actual)
-        assertEquals(1, cacheDataSource.containsCalledList.size)
-        assertEquals(false, cacheDataSource.containsCalledList[0])
         assertEquals(0, cacheDataSource.numberFactCalled.size)
         assertEquals(1, cacheDataSource.saveNumberFactCalledCount)
-        assertEquals(expected, cacheDataSource.data[0])
+        assertEquals(NumberData("10", "fact 10"), cacheDataSource.data[0])
         assertEquals(1, cloudDataSource.randomNumberFactCalledCount)
     }
 
@@ -123,12 +128,10 @@ class BaseRepositoryTest {
         cacheDataSource.replaceData(listOf(NumberData("10", "fact 10")))
 
         val actual = repository.randomNumberFact()
-        val expected = NumberData("10", "cloud 10")
+        val expected = NumberFact("10", "cloud fact 10")
         assertEquals(expected, actual)
         assertEquals(1, cloudDataSource.randomNumberFactCalledCount)
-        assertEquals(1, cacheDataSource.containsCalledList.size)
-        assertEquals(true, cacheDataSource.containsCalledList[0])
-        assertEquals(1, cacheDataSource.numberFactCalled.size)
+        assertEquals(0, cacheDataSource.numberFactCalled.size)
         assertEquals(1, cacheDataSource.saveNumberFactCalledCount)
     }
 
@@ -147,7 +150,7 @@ class BaseRepositoryTest {
             numberData = expected
         }
 
-        override suspend fun numberFact(number: String): NumberData {
+        override suspend fun fact(number: String): NumberData {
             numberFactCalledCount++
             return if (isConnection) {
                 numberData
@@ -184,7 +187,7 @@ class BaseRepositoryTest {
             return data
         }
 
-        override suspend fun numberFact(number: String): NumberData {
+        override suspend fun fact(number: String): NumberData {
             numberFactCalled.add(number)
             return data[0]
         }
@@ -194,8 +197,8 @@ class BaseRepositoryTest {
             data.add(numberData)
         }
 
-        override fun contains(number: String): Boolean {
-            val result = data.find { it.matches() } != null
+        override suspend fun contains(number: String): Boolean {
+            val result = data.find { it.matches(number) } != null
             containsCalledList.add(result)
             return result
         }

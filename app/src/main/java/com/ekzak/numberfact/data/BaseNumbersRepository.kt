@@ -3,17 +3,28 @@ package com.ekzak.numberfact.data
 import com.ekzak.numberfact.domain.NumberFact
 import com.ekzak.numberfact.domain.NumbersRepository
 
-class BaseNumbersRepository: NumbersRepository {
+class BaseNumbersRepository(
+    private val cloudDataSource: NumbersCloudDataSource,
+    private val cacheDataSource: NumbersCacheDataSource,
+    private val mapperToDomain: NumberData.Mapper<NumberFact>,
+    private val handleDataRequest: HandleDataRequest,
+) : NumbersRepository {
 
     override suspend fun allNumbers(): List<NumberFact> {
-        TODO("Not yet implemented")
+        val data = cacheDataSource.allNumbers()
+        return data.map { it.map(mapperToDomain) }
     }
 
-    override suspend fun numberFact(number: String): NumberFact {
-        TODO("Not yet implemented")
+    override suspend fun numberFact(number: String): NumberFact = handleDataRequest.handle {
+        val dataSource = if (cacheDataSource.contains(number)) {
+            cacheDataSource
+        } else {
+            cloudDataSource
+        }
+        dataSource.fact(number)
     }
 
-    override suspend fun randomNumberFact(): NumberFact {
-        TODO("Not yet implemented")
+    override suspend fun randomNumberFact(): NumberFact = handleDataRequest.handle {
+        cloudDataSource.randomNumberFact()
     }
 }
