@@ -1,5 +1,6 @@
 package com.ekzak.numberfact.data
 
+import com.ekzak.numberfact.data.cache.NumbersCacheDataSource
 import com.ekzak.numberfact.domain.HandleError
 import com.ekzak.numberfact.domain.NumberFact
 

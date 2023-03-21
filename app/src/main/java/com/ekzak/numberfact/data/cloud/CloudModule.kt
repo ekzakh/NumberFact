@@ -1,4 +1,4 @@
-package com.ekzak.numberfact.data
+package com.ekzak.numberfact.data.cloud
 
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -30,12 +30,12 @@ interface CloudModule {
         }
     }
 
-    class Debug : CloudModule.Abstract() {
+    class Debug : Abstract() {
 
         override val level = HttpLoggingInterceptor.Level.BODY
     }
 
-    class Base : CloudModule.Abstract() {
+    class Base : Abstract() {
 
         override val level = HttpLoggingInterceptor.Level.NONE
     }

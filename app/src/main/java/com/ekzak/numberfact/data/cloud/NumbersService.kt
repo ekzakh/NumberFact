@@ -1,4 +1,4 @@
-package com.ekzak.numberfact.data
+package com.ekzak.numberfact.data.cloud
 
 import retrofit2.Response
 import retrofit2.http.GET

@@ -2,9 +2,9 @@ package com.ekzak.numberfact
 
 import android.app.Application
 import android.util.Log
-import com.ekzak.numberfact.data.CloudModule
-import com.ekzak.numberfact.data.NumbersCloudDataSource
-import com.ekzak.numberfact.data.NumbersService
+import com.ekzak.numberfact.data.cloud.CloudModule
+import com.ekzak.numberfact.data.cloud.NumbersCloudDataSource
+import com.ekzak.numberfact.data.cloud.NumbersService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

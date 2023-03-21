@@ -1,5 +1,7 @@
 package com.ekzak.numberfact.data
 
+import com.ekzak.numberfact.data.cache.NumbersCacheDataSource
+import com.ekzak.numberfact.data.cloud.NumbersCloudDataSource
 import com.ekzak.numberfact.domain.NoConnectionException
 import com.ekzak.numberfact.domain.NumberFact
 import com.ekzak.numberfact.domain.NumbersRepository

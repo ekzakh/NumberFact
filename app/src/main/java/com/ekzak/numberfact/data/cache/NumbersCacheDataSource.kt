@@ -1,4 +1,6 @@
-package com.ekzak.numberfact.data
+package com.ekzak.numberfact.data.cache
+
+import com.ekzak.numberfact.data.NumberData
 
 interface NumbersCacheDataSource : FetchFact {
 

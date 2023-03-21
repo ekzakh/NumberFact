@@ -1,4 +1,7 @@
-package com.ekzak.numberfact.data
+package com.ekzak.numberfact.data.cloud
+
+import com.ekzak.numberfact.data.cache.FetchFact
+import com.ekzak.numberfact.data.NumberData
 
 interface NumbersCloudDataSource : FetchFact {
 
