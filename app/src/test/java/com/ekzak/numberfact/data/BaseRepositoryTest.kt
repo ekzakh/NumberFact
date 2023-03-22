@@ -152,7 +152,7 @@ class BaseRepositoryTest {
             numberData = expected
         }
 
-        override suspend fun fact(number: String): NumberData {
+        override suspend fun numberFact(number: String): NumberData {
             numberFactCalledCount++
             return if (isConnection) {
                 numberData
@@ -189,7 +189,7 @@ class BaseRepositoryTest {
             return data
         }
 
-        override suspend fun fact(number: String): NumberData {
+        override suspend fun numberFact(number: String): NumberData {
             numberFactCalled.add(number)
             return data[0]
         }

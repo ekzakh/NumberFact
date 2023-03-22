@@ -18,7 +18,7 @@ interface NumbersCloudDataSource : FetchFact {
             throw IllegalStateException("Service unavailable")
         }
 
-        override suspend fun fact(number: String): NumberData {
+        override suspend fun numberFact(number: String): NumberData {
             val fact = service.fact(number)
             return NumberData(number, fact)
         }

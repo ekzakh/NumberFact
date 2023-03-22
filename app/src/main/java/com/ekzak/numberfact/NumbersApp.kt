@@ -21,7 +21,7 @@ class NumbersApp : Application() {
         }
         GlobalScope.launch(Dispatchers.IO) {
             val dataSource = NumbersCloudDataSource.Base(service)
-            val fact = dataSource.fact("10")
+            val fact = dataSource.numberFact("10")
             Log.d("TAG", fact.toString())
         }
     }
