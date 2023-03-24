@@ -18,7 +18,7 @@ class NumberResultMapperTest: BaseTest() {
     @Test
     fun `test error`() {
         mapper.map(emptyList(), "error message")
-        assertEquals(UiState.Error("error message"), communications.stateCalledList[0])
+        assertEquals(UiState.ShowError("error message"), communications.stateCalledList[0])
     }
 
     @Test

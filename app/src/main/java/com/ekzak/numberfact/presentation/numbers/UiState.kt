@@ -1,18 +1,28 @@
 package com.ekzak.numberfact.presentation.numbers
 
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
+
 sealed class UiState {
 
-    interface Mapper<T> {
-        fun map(message: String): T
-    }
-
-    abstract fun <T> map(mapper: Mapper<T>): T
+    abstract fun apply(inputLayout: TextInputLayout, inputText: TextInputEditText)
 
     object Success : UiState() {
-        override fun <T> map(mapper: Mapper<T>): T = mapper.map("")
+
+        override fun apply(inputLayout: TextInputLayout, inputText: TextInputEditText) {
+            inputText.setText("")
+        }
     }
 
-    data class Error(private val message: String): UiState() {
-        override fun <T> map(mapper: Mapper<T>): T = mapper.map( message)
+    abstract class AbstractError(private val message: String, private val errorEnabled: Boolean) : UiState() {
+
+        override fun apply(inputLayout: TextInputLayout, inputText: TextInputEditText) = with(inputLayout) {
+            isErrorEnabled = errorEnabled
+            error = message
+        }
     }
+
+    data class ShowError(private val message: String) : AbstractError(message, true)
+
+    object ClearError : AbstractError("", false)
 }

@@ -4,10 +4,13 @@ import android.widget.TextView
 
 data class NumberUi(
     private val number: String,
-    private val fact: String
-) {
+    private val fact: String,
+) : Mapper<Boolean, NumberUi> {
+
     fun map(head: TextView, subTitle: TextView) {
         head.text = number
         subTitle.text = fact
     }
+
+    override fun map(source: NumberUi): Boolean = source.number == number
 }

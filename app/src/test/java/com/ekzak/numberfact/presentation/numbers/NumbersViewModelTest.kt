@@ -87,7 +87,7 @@ class NumbersViewModelTest : BaseTest() {
         assertEquals(false, communications.progressCalledList[3])
         //result
         assertEquals(2, communications.stateCalledList.size)
-        assertEquals(UiState.Error("No internet connection"), communications.stateCalledList[1])
+        assertEquals(UiState.ShowError("No internet connection"), communications.stateCalledList[1])
         assertEquals(0, communications.numbersList.size)
 
         //rotate screen
@@ -111,7 +111,7 @@ class NumbersViewModelTest : BaseTest() {
         assertEquals(0, interactor.fetchNumberFactCalledList.size)
         //result
         assertEquals(1, communications.stateCalledList.size)
-        assertEquals(UiState.Error("Please input a number"), communications.stateCalledList[0])
+        assertEquals(UiState.ShowError("Please input a number"), communications.stateCalledList[0])
         assertEquals(0, communications.showListCalled)
     }
 
@@ -139,6 +139,14 @@ class NumbersViewModelTest : BaseTest() {
         assertEquals(UiState.Success, communications.stateCalledList[0])
         assertEquals(1, communications.showListCalled)
         assertEquals(NumberUi("89", "Fact about 89"), communications.numbersList[0])
+    }
+
+    @Test
+    fun `test clear error`() {
+        viewModel.clearError()
+
+        assertEquals(1, communications.stateCalledList.size)
+        assertEquals(UiState.ClearError, communications.stateCalledList[0])
     }
 
     private class TestManageResources : ManageResources {
