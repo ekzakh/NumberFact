@@ -1,5 +1,6 @@
 package com.ekzak.numberfact.presentation.numbers
 
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -11,7 +12,7 @@ class NumbersAdapter(private val clickListener: ClickListener) : RecyclerView.Ad
     private val list = mutableListOf<NumberUi>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NumbersViewHolder {
-        val binding = NumberItemBinding.bind(parent)
+        val binding = NumberItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return NumbersViewHolder(binding, clickListener)
     }
 
