@@ -10,18 +10,18 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.ekzak.numberfact.R
 import com.ekzak.numberfact.databinding.FragmentNumbersBinding
 import com.ekzak.numberfact.presentation.MainActivity
+import com.ekzak.numberfact.presentation.fact.FactFragment
 
 class NumbersFragment : Fragment(R.layout.fragment_numbers) {
 
     private val binding by viewBinding(FragmentNumbersBinding::bind)
-    private lateinit var listener: NumbersListener
+    private lateinit var showFragment: ShowFragment
     private lateinit var viewModel: NumbersViewModel
-
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is MainActivity) {
-            listener = context
+            showFragment = context
         } else {
             throw IllegalAccessException("NumbersListener must implement")
         }
@@ -31,7 +31,7 @@ class NumbersFragment : Fragment(R.layout.fragment_numbers) {
         super.onViewCreated(view, savedInstanceState)
         val adapter = NumbersAdapter(object : ClickListener {
             override fun click(item: NumberUi) {
-                //todo move to next screen
+                showFragment.show(FactFragment.getInstance(item.ui()))
             }
         })
         binding.recycler.adapter = adapter
@@ -79,4 +79,3 @@ class NumbersFragment : Fragment(R.layout.fragment_numbers) {
         override fun afterTextChanged(s: Editable?) = Unit
     }
 }
-

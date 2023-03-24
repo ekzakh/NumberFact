@@ -4,11 +4,10 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.ekzak.numberfact.R
-import com.ekzak.numberfact.presentation.fact.FactFragment
 import com.ekzak.numberfact.presentation.numbers.NumbersFragment
-import com.ekzak.numberfact.presentation.numbers.NumbersListener
+import com.ekzak.numberfact.presentation.numbers.ShowFragment
 
-class MainActivity : AppCompatActivity(), NumbersListener {
+class MainActivity : AppCompatActivity(), ShowFragment {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -29,7 +28,7 @@ class MainActivity : AppCompatActivity(), NumbersListener {
             .commit()
     }
 
-    override fun factClicked() {
-        navigate(FactFragment.getInstance(""), false)
+    override fun show(fragment: Fragment) {
+        navigate(fragment, false)
     }
 }
