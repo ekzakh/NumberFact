@@ -11,6 +11,7 @@ import com.ekzak.numberfact.R
 import com.ekzak.numberfact.databinding.FragmentNumbersBinding
 import com.ekzak.numberfact.presentation.MainActivity
 import com.ekzak.numberfact.presentation.fact.FactFragment
+import com.ekzak.numberfact.sl.ProvideViewModel
 
 class NumbersFragment : Fragment(R.layout.fragment_numbers) {
 
@@ -27,11 +28,18 @@ class NumbersFragment : Fragment(R.layout.fragment_numbers) {
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel = (requireActivity() as ProvideViewModel).provideViewModel(
+            NumbersViewModel::class.java, this
+        )
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val adapter = NumbersAdapter(object : ClickListener {
             override fun click(item: NumberUi) {
-                showFragment.show(FactFragment.getInstance(item.ui()))
+                showFragment.show(FactFragment.getInstance(item.map(DetailsUi())))
             }
         })
         binding.recycler.adapter = adapter
@@ -55,6 +63,7 @@ class NumbersFragment : Fragment(R.layout.fragment_numbers) {
             state.apply(binding.inputLayout, binding.inputNumber)
         }
 
+        viewModel.init(savedInstanceState == null)
         handleButtonsClick()
     }
 

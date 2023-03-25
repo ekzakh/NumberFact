@@ -1,28 +1,23 @@
 package com.ekzak.numberfact
 
 import android.app.Application
-import android.util.Log
-import com.ekzak.numberfact.data.cloud.CloudModule
-import com.ekzak.numberfact.data.cloud.NumbersCloudDataSource
-import com.ekzak.numberfact.data.cloud.NumbersService
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStoreOwner
+import com.ekzak.numberfact.sl.Core
+import com.ekzak.numberfact.sl.DependencyContainer
+import com.ekzak.numberfact.sl.ProvideViewModel
+import com.ekzak.numberfact.sl.ViewModelsFactory
 
-class NumbersApp : Application() {
+class NumbersApp : Application(), ProvideViewModel {
+
+    private lateinit var viewModelsFactory: ViewModelsFactory
 
     override fun onCreate() {
         super.onCreate()
-        //todo move out
-        val service = if (BuildConfig.DEBUG) {
-            CloudModule.Debug().service(NumbersService::class.java)
-        } else {
-            CloudModule.Base().service(NumbersService::class.java)
-        }
-        GlobalScope.launch(Dispatchers.IO) {
-            val dataSource = NumbersCloudDataSource.Base(service)
-            val fact = dataSource.numberFact("10")
-            Log.d("TAG", fact.toString())
-        }
+        viewModelsFactory = ViewModelsFactory(DependencyContainer.Base(Core.Base(this, !BuildConfig.DEBUG)))
     }
+
+    override fun <T : ViewModel> provideViewModel(clazz: Class<T>, owner: ViewModelStoreOwner): T =
+        ViewModelProvider(owner, viewModelsFactory)[clazz]
 }

@@ -38,7 +38,7 @@ class NumbersViewHolder(
 
     fun bind(model: NumberUi) {
         with(binding) {
-            model.map(title, subTitle)
+            model.map(ListItemUi(title, subTitle))
         }
 
         itemView.setOnClickListener {
@@ -62,7 +62,6 @@ class DiffUtilCallback(
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
         oldList[oldItemPosition].map(newList[newItemPosition])
-
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
         oldList[oldItemPosition] == newList[newItemPosition]
