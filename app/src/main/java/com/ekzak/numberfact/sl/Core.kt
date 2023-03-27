@@ -22,7 +22,7 @@ interface Core : CloudModule, CacheModule, ManageResources {
             if (isRelease) {
                 CloudModule.Base()
             } else {
-                CloudModule.Debug()
+                CloudModule.Mock()
             }
         }
 

@@ -8,35 +8,32 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 interface CloudModule {
     fun <T> service(clazz: Class<T>): T
 
-    abstract class Abstract : CloudModule {
-
-        protected abstract val level: HttpLoggingInterceptor.Level
-        protected open val baseUrl = "http://numbersapi.com/"
+    class Base : CloudModule {
 
         override fun <T> service(clazz: Class<T>): T {
-            //todo refactor when added serviceLocator
             val interceptor = HttpLoggingInterceptor().apply {
-                setLevel(level)
+                setLevel(HttpLoggingInterceptor.Level.BODY)
             }
             val client = OkHttpClient.Builder()
                 .addInterceptor(interceptor)
                 .build()
             val retrofit = Retrofit.Builder()
                 .client(client)
-                .baseUrl(baseUrl)
+                .baseUrl(BASE_URL)
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .build()
             return retrofit.create(clazz)
         }
+
+        companion object {
+            private const val BASE_URL = "http://numbersapi.com/"
+        }
     }
 
-    class Debug : Abstract() {
-
-        override val level = HttpLoggingInterceptor.Level.BODY
-    }
-
-    class Base : Abstract() {
-
-        override val level = HttpLoggingInterceptor.Level.NONE
+    @Suppress("UNCHECKED_CAST")
+    class Mock : CloudModule {
+        override fun <T> service(clazz: Class<T>): T {
+            return MockNumbersService() as T
+        }
     }
 }
