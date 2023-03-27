@@ -19,6 +19,10 @@ class NumbersFragment : Fragment(R.layout.fragment_numbers) {
     private lateinit var showFragment: ShowFragment
     private lateinit var viewModel: NumbersViewModel
 
+    private val watcher = object : SimpleTextWatcher() {
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = viewModel.clearError()
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is MainActivity) {
@@ -43,13 +47,6 @@ class NumbersFragment : Fragment(R.layout.fragment_numbers) {
             }
         })
         binding.recycler.adapter = adapter
-
-        binding.inputNumber.addTextChangedListener(object : SimpleTextWatcher() {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                super.beforeTextChanged(s, start, count, after)
-                viewModel.clearError()
-            }
-        })
 
         viewModel.observeNumbersList(viewLifecycleOwner) {
             adapter.map(it)
@@ -76,6 +73,16 @@ class NumbersFragment : Fragment(R.layout.fragment_numbers) {
                 viewModel.fetchRandomNumberFact()
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        binding.inputNumber.addTextChangedListener(watcher)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        binding.inputNumber.removeTextChangedListener(watcher)
     }
 
     companion object {
