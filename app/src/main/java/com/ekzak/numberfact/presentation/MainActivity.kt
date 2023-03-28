@@ -15,24 +15,14 @@ class MainActivity : AppCompatActivity(), ShowFragment, ProvideViewModel {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         if (savedInstanceState == null) {
-            navigate(NumbersFragment.getInstance(), true)
+            NavigationStrategy.Add(NumbersFragment.getInstance())
+                .navigate(supportFragmentManager, R.id.container)
         }
-    }
-
-    private fun navigate(fragment: Fragment, add: Boolean) {
-        val transaction = supportFragmentManager.beginTransaction()
-        val container = R.id.container
-        if (add) {
-            transaction.add(container, fragment)
-        } else {
-            transaction.replace(container, fragment)
-        }
-        transaction.addToBackStack(fragment::class.java.simpleName)
-            .commit()
     }
 
     override fun show(fragment: Fragment) {
-        navigate(fragment, false)
+        NavigationStrategy.Replace(fragment)
+            .navigate(supportFragmentManager, R.id.container)
     }
 
     override fun <T : ViewModel> provideViewModel(clazz: Class<T>, owner: ViewModelStoreOwner): T =
