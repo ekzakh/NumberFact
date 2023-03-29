@@ -1,6 +1,7 @@
 package com.ekzak.numberfact.domain
 
-import com.ekzak.numberfact.presentation.ManageResources
+import com.ekzak.numberfact.data.NumberFactDetails
+import com.ekzak.numberfact.presentation.main.ManageResources
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -18,7 +19,8 @@ class NumbersInteractorTest {
         interactor =
             NumbersInteractor.Base(
                 repository,
-                HandleRequest.Base(HandleError.Base(manageResources), repository)
+                HandleRequest.Base(HandleError.Base(manageResources), repository),
+                NumberFactDetails.Base()
             )
     }
 

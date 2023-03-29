@@ -1,49 +1,28 @@
 package com.ekzak.numberfact.presentation.numbers
 
-import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.ekzak.numberfact.R
 import com.ekzak.numberfact.databinding.FragmentNumbersBinding
-import com.ekzak.numberfact.presentation.MainActivity
-import com.ekzak.numberfact.presentation.fact.FactFragment
-import com.ekzak.numberfact.sl.ProvideViewModel
+import com.ekzak.numberfact.presentation.main.BaseFragment
 
-class NumbersFragment : Fragment(R.layout.fragment_numbers) {
+class NumbersFragment : BaseFragment<NumbersViewModel.Base>(R.layout.fragment_numbers) {
 
+    override var viewModelClass = NumbersViewModel.Base::class.java
     private val binding by viewBinding(FragmentNumbersBinding::bind)
-    private lateinit var showFragment: ShowFragment
-    private lateinit var viewModel: NumbersViewModel
 
     private val watcher = object : SimpleTextWatcher() {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = viewModel.clearError()
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is MainActivity) {
-            showFragment = context
-        } else {
-            throw IllegalAccessException("NumbersListener must implement")
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel = (requireActivity() as ProvideViewModel).provideViewModel(
-            NumbersViewModel::class.java, this
-        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val adapter = NumbersAdapter(object : ClickListener {
             override fun click(item: NumberUi) {
-                showFragment.show(FactFragment.getInstance(item.map(DetailsUi())))
+                viewModel.showFact(item)
             }
         })
         binding.recycler.adapter = adapter
@@ -83,10 +62,6 @@ class NumbersFragment : Fragment(R.layout.fragment_numbers) {
     override fun onPause() {
         super.onPause()
         binding.inputNumber.removeTextChangedListener(watcher)
-    }
-
-    companion object {
-        fun getInstance() = NumbersFragment()
     }
 
     abstract class SimpleTextWatcher : TextWatcher {

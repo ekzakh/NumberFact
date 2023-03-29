@@ -1,4 +1,4 @@
-package com.ekzak.numberfact.presentation
+package com.ekzak.numberfact.presentation.main
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -13,7 +13,6 @@ interface NavigationStrategy {
         override fun navigate(manager: FragmentManager, containerId: Int) {
             manager.beginTransaction()
                 .executeTransaction(containerId)
-                .addToBackStack(fragment.javaClass.simpleName)
                 .commit()
         }
 
@@ -30,5 +29,6 @@ interface NavigationStrategy {
 
         override fun FragmentTransaction.executeTransaction(containerId: Int): FragmentTransaction =
             add(containerId, fragment)
+                .addToBackStack(fragment.javaClass.simpleName)
     }
 }

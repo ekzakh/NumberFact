@@ -4,11 +4,11 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
-import com.ekzak.numberfact.sl.Core
-import com.ekzak.numberfact.sl.DependencyContainer
-import com.ekzak.numberfact.sl.ProvideInstances
-import com.ekzak.numberfact.sl.ProvideViewModel
-import com.ekzak.numberfact.sl.ViewModelsFactory
+import com.ekzak.numberfact.sl.main.Core
+import com.ekzak.numberfact.sl.main.DependencyContainer
+import com.ekzak.numberfact.sl.main.ProvideInstances
+import com.ekzak.numberfact.sl.main.ProvideViewModel
+import com.ekzak.numberfact.sl.main.ViewModelsFactory
 
 class NumbersApp : Application(), ProvideViewModel {
 

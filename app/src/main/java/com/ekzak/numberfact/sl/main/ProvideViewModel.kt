@@ -1,4 +1,4 @@
-package com.ekzak.numberfact.sl
+package com.ekzak.numberfact.sl.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelStoreOwner

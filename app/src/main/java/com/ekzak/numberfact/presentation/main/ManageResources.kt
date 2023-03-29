@@ -1,4 +1,4 @@
-package com.ekzak.numberfact.presentation
+package com.ekzak.numberfact.presentation.main
 
 import android.content.Context
 import androidx.annotation.StringRes

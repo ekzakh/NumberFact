@@ -3,7 +3,8 @@ package com.ekzak.numberfact.presentation.numbers
 import com.ekzak.numberfact.domain.NumberFact
 import com.ekzak.numberfact.domain.NumberResult
 import com.ekzak.numberfact.domain.NumbersInteractor
-import com.ekzak.numberfact.presentation.ManageResources
+import com.ekzak.numberfact.presentation.main.ManageResources
+import com.ekzak.numberfact.presentation.main.NavigationStrategy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -14,10 +15,12 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 
 class NumbersViewModelTest : BaseTest() {
 
+    private lateinit var navigation: TestNavigationCommunication
     private lateinit var communications: TestNumbersCommunications
     private lateinit var interactor: TestNumbersInteractor
     private lateinit var viewModel: NumbersViewModel
@@ -28,23 +31,28 @@ class NumbersViewModelTest : BaseTest() {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun init() {
+        navigation = TestNavigationCommunication()
         communications = TestNumbersCommunications()
         interactor = TestNumbersInteractor()
         manageResources = TestManageResources()
         dispatchersList = TestDispatchersList()
+        val mapper = TestUiMapper()
         handleNumbersRequest = HandleNumbersRequest.Base(
             dispatchersList,
             communications,
             NumberResultMapper(communications, NumberUiMapper())
         )
-        viewModel = NumbersViewModel(
+        viewModel = NumbersViewModel.Base(
             communications,
             interactor,
             manageResources,
-            handleNumbersRequest
+            handleNumbersRequest,
+            navigation,
+            mapper
         )
         Dispatchers.setMain(UnconfinedTestDispatcher())
     }
+
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @After
@@ -149,6 +157,14 @@ class NumbersViewModelTest : BaseTest() {
         assertEquals(UiState.ClearError, communications.stateCalledList[0])
     }
 
+    @Ignore //todo check test with viewBinding
+    @Test
+    fun `test navigation show details`() {
+        viewModel.showFact(NumberUi("0", "fact"))
+        assertEquals("0 fact", interactor.details)
+        assertEquals(true, navigation.strategy is NavigationStrategy.Add)
+    }
+
     private class TestManageResources : ManageResources {
         private var stringValue: String = ""
         override fun string(id: Int): String {
@@ -168,6 +184,8 @@ class NumbersViewModelTest : BaseTest() {
         val fetchNumberFactCalledList = mutableListOf<NumberResult>()
         val fetchRandomNumberFactCalledList = mutableListOf<NumberResult>()
 
+        var details = ""
+
         fun changeExpectedResult(newResult: NumberResult) {
             result = newResult
         }
@@ -186,6 +204,10 @@ class NumbersViewModelTest : BaseTest() {
             fetchRandomNumberFactCalledList.add(result)
             return result
         }
+
+        override fun saveDetails(details: String) {
+            this.details = details
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -195,6 +217,10 @@ class NumbersViewModelTest : BaseTest() {
         override fun io(): CoroutineDispatcher = dispatcher
 
         override fun ui(): CoroutineDispatcher = dispatcher
+    }
+
+    private class TestUiMapper: NumberUi.Mapper<String> {
+        override fun map(number: String, fact: String): String = "$number $fact"
     }
 
 }

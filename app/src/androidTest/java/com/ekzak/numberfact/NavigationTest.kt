@@ -10,7 +10,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.ekzak.numberfact.presentation.MainActivity
+import com.ekzak.numberfact.presentation.main.MainActivity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -35,7 +35,7 @@ class NavigationTest {
         //navigate to details
         onView(withId(R.id.sub_title)).perform(click())
 
-        onView(withId(R.id.fact)).check(matches(withText("10\n\nFact about 10")))
+        onView(withId(R.id.fact_details)).check(matches(withText("10\n\nFact about 10")))
 
         pressBack()
         onView(withId(R.id.title)).check(matches(withText("10")))

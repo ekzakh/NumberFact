@@ -1,4 +1,4 @@
-package com.ekzak.numberfact.sl
+package com.ekzak.numberfact.sl.main
 
 import android.content.Context
 import com.ekzak.numberfact.data.cache.CacheModule
@@ -7,6 +7,7 @@ import com.ekzak.numberfact.data.cloud.CloudModule
 interface ProvideInstances {
 
     fun provideCloudModule(): CloudModule
+
     fun provideCacheModule(): CacheModule
 
     class Release(private val context: Context) : ProvideInstances {

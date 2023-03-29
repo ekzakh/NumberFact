@@ -1,4 +1,4 @@
-package com.ekzak.numberfact.sl
+package com.ekzak.numberfact.sl.numbers
 
 import com.ekzak.numberfact.data.BaseNumbersRepository
 import com.ekzak.numberfact.data.HandleDataRequest
@@ -11,6 +11,7 @@ import com.ekzak.numberfact.data.cloud.NumbersService
 import com.ekzak.numberfact.domain.HandleError
 import com.ekzak.numberfact.domain.HandleRequest
 import com.ekzak.numberfact.domain.NumbersInteractor
+import com.ekzak.numberfact.presentation.numbers.DetailsUi
 import com.ekzak.numberfact.presentation.numbers.HandleNumbersRequest
 import com.ekzak.numberfact.presentation.numbers.NumberResultMapper
 import com.ekzak.numberfact.presentation.numbers.NumberUiMapper
@@ -19,12 +20,14 @@ import com.ekzak.numberfact.presentation.numbers.NumbersListCommunication
 import com.ekzak.numberfact.presentation.numbers.NumbersStateCommunication
 import com.ekzak.numberfact.presentation.numbers.NumbersViewModel
 import com.ekzak.numberfact.presentation.numbers.ProgressCommunication
+import com.ekzak.numberfact.sl.main.Core
+import com.ekzak.numberfact.sl.main.Module
 
 class NumbersModule(
     private val core: Core,
-) : Module<NumbersViewModel> {
+) : Module<NumbersViewModel.Base> {
 
-    override fun viewModel(): NumbersViewModel {
+    override fun viewModel(): NumbersViewModel.Base {
 
         val communications = NumbersCommunications.Base(
             ProgressCommunication.Base(),
@@ -44,17 +47,20 @@ class NumbersModule(
                 mapperToDomain
             )
         )
-        return NumbersViewModel(
+        return NumbersViewModel.Base(
             communications,
             NumbersInteractor.Base(
                 repository,
                 HandleRequest.Base(
                     HandleError.Base(core),
                     repository
-                )
+                ),
+                core.provideFactDetails()
             ),
             core,
-            HandleNumbersRequest.Base(core.provideDispatchers(), communications, resultMapper)
+            HandleNumbersRequest.Base(core.provideDispatchers(), communications, resultMapper),
+            core.provideNavigation(),
+            DetailsUi()
         )
     }
 }

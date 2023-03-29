@@ -3,6 +3,7 @@ package com.ekzak.numberfact.presentation.numbers
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import com.ekzak.numberfact.presentation.main.SingleLiveEvent
 
 interface Communications {
 
@@ -35,4 +36,8 @@ interface Communications {
             source?.let { liveData.postValue(it) }
         }
     }
+
+    abstract class SingleUi<T> : Ui<T>(SingleLiveEvent())
+
+    abstract class SinglePost<T> : Post<T>(SingleLiveEvent())
 }

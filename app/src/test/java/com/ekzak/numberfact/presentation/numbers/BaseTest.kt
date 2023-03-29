@@ -2,6 +2,8 @@ package com.ekzak.numberfact.presentation.numbers
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
+import com.ekzak.numberfact.presentation.main.NavigationCommunication
+import com.ekzak.numberfact.presentation.main.NavigationStrategy
 
 abstract class BaseTest {
     protected class TestNumbersCommunications : NumbersCommunications {
@@ -29,5 +31,19 @@ abstract class BaseTest {
         override fun observeState(owner: LifecycleOwner, observer: Observer<UiState>) = Unit
 
         override fun observeNumbersList(owner: LifecycleOwner, observer: Observer<List<NumberUi>>) = Unit
+    }
+
+
+    protected class TestNavigationCommunication: NavigationCommunication.Mutable {
+
+        lateinit var strategy: NavigationStrategy
+        var count = 0
+
+        override fun observe(owner: LifecycleOwner, observer: Observer<NavigationStrategy>) = Unit
+
+        override fun map(source: NavigationStrategy) {
+            strategy = source
+            count++
+        }
     }
 }

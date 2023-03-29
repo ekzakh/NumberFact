@@ -1,7 +1,7 @@
 package com.ekzak.numberfact.domain
 
 import com.ekzak.numberfact.R
-import com.ekzak.numberfact.presentation.ManageResources
+import com.ekzak.numberfact.presentation.main.ManageResources
 
 interface HandleError<T> {
     fun handle(e: Exception): T
