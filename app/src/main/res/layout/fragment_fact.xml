@@ -6,7 +6,7 @@
     android:background="@color/white">
 
     <TextView
-        android:id = "@+id/fact_details"
+        android:id="@+id/fact_details"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
