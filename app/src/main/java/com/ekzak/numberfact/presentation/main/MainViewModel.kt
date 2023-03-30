@@ -4,7 +4,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.ekzak.numberfact.presentation.numbers.Communications
-import com.ekzak.numberfact.presentation.numbers.NumbersFragment
 
 class MainViewModel(
     private val navigationCommunication: NavigationCommunication.Mutable,
@@ -12,7 +11,7 @@ class MainViewModel(
 
     override fun init(isFirstRun: Boolean) {
         if (isFirstRun) {
-            navigationCommunication.map(NavigationStrategy.Replace(NumbersFragment()))
+            navigationCommunication.map(NavigationStrategy.Replace(Screen.Numbers))
         }
     }
 

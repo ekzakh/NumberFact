@@ -1,6 +1,5 @@
 package com.ekzak.numberfact.presentation.main
 
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 
@@ -8,7 +7,7 @@ interface NavigationStrategy {
 
     fun navigate(manager: FragmentManager, containerId: Int)
 
-    abstract class Abstract(protected val fragment: Fragment) : NavigationStrategy {
+    abstract class Abstract(protected open val screen: Screen) : NavigationStrategy {
 
         override fun navigate(manager: FragmentManager, containerId: Int) {
             manager.beginTransaction()
@@ -19,16 +18,18 @@ interface NavigationStrategy {
         protected abstract fun FragmentTransaction.executeTransaction(containerId: Int): FragmentTransaction
     }
 
-    class Replace(fragment: Fragment) : Abstract(fragment) {
+    data class Replace(override val screen: Screen) : Abstract(screen) {
 
         override fun FragmentTransaction.executeTransaction(containerId: Int): FragmentTransaction =
-            replace(containerId, fragment)
+            replace(containerId, screen.fragment().newInstance())
     }
 
-    class Add(fragment: Fragment) : Abstract(fragment) {
+    data class Add(override val screen: Screen) : Abstract(screen) {
 
         override fun FragmentTransaction.executeTransaction(containerId: Int): FragmentTransaction =
-            add(containerId, fragment)
-                .addToBackStack(fragment.javaClass.simpleName)
+            screen.fragment().let { fragmentClass ->
+                add(containerId, fragmentClass.newInstance())
+                    .addToBackStack(fragmentClass.simpleName)
+            }
     }
 }

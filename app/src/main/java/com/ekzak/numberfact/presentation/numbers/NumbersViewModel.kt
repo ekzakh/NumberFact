@@ -10,7 +10,7 @@ import com.ekzak.numberfact.presentation.main.Init
 import com.ekzak.numberfact.presentation.main.ManageResources
 import com.ekzak.numberfact.presentation.main.NavigationCommunication
 import com.ekzak.numberfact.presentation.main.NavigationStrategy
-import com.ekzak.numberfact.presentation.fact.FactFragment
+import com.ekzak.numberfact.presentation.main.Screen
 
 interface NumbersViewModel : Init, ObserveNumbers, FetchNumbers, ClearError {
 
@@ -65,7 +65,7 @@ interface NumbersViewModel : Init, ObserveNumbers, FetchNumbers, ClearError {
         override fun showFact(number: NumberUi) {
             val details = number.map(detailsMapper)
             interactor.saveDetails(details)
-            navigationCommunication.map(NavigationStrategy.Add(FactFragment()))
+            navigationCommunication.map(NavigationStrategy.Add(Screen.Details))
         }
     }
 }

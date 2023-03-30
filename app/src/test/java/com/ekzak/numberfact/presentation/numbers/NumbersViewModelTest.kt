@@ -5,6 +5,7 @@ import com.ekzak.numberfact.domain.NumberResult
 import com.ekzak.numberfact.domain.NumbersInteractor
 import com.ekzak.numberfact.presentation.main.ManageResources
 import com.ekzak.numberfact.presentation.main.NavigationStrategy
+import com.ekzak.numberfact.presentation.main.Screen
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,7 +16,6 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 
 class NumbersViewModelTest : BaseTest() {
@@ -157,12 +157,11 @@ class NumbersViewModelTest : BaseTest() {
         assertEquals(UiState.ClearError, communications.stateCalledList[0])
     }
 
-    @Ignore //todo check test with viewBinding
     @Test
     fun `test navigation show details`() {
         viewModel.showFact(NumberUi("0", "fact"))
         assertEquals("0 fact", interactor.details)
-        assertEquals(true, navigation.strategy is NavigationStrategy.Add)
+        assertEquals(NavigationStrategy.Add(Screen.Details), navigation.strategy)
     }
 
     private class TestManageResources : ManageResources {
