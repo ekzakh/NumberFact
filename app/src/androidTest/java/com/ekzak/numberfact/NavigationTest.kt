@@ -30,7 +30,7 @@ class NavigationTest : BaseTest(){
         }
 
         DetailsPage().details.view().checkText("10\n\nFact about 10")
-        
+
         pressBack()
 
         numbersPage.run {
