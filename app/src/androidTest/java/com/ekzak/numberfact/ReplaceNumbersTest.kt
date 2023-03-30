@@ -1,17 +1,8 @@
 package com.ekzak.numberfact
 
-import androidx.test.ext.junit.rules.ActivityScenarioRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.ekzak.numberfact.presentation.main.MainActivity
-import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 
-@RunWith(AndroidJUnit4::class)
 class ReplaceNumbersTest : BaseTest() {
-
-    @get:Rule
-    var activityRule = ActivityScenarioRule(MainActivity::class.java)
 
     @Test
     fun test_not_duplicated_items(): Unit = NumbersPage().run {
