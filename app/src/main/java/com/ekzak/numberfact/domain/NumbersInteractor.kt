@@ -2,19 +2,16 @@ package com.ekzak.numberfact.domain
 
 import com.ekzak.numberfact.data.NumberFactDetails
 
-interface NumbersInteractor {
-    suspend fun init(): NumberResult
-
-    suspend fun fetchNumberFact(number: String): NumberResult
-
-    suspend fun fetchRandomNumberFact(): NumberResult
-
-    fun saveDetails(details: String)
+interface NumbersInteractor :
+    NumbersInitialUseCase,
+    NumbersFactUseCase,
+    RandomNumberFactUseCase,
+    NumberDetailsUseCase {
 
     class Base(
         private val repository: NumbersRepository,
         private val handleRequest: HandleRequest,
-        private val numberFactDetails: NumberFactDetails.Save
+        private val numberFactDetails: NumberFactDetails.Save,
     ) : NumbersInteractor {
         override suspend fun init(): NumberResult {
             return NumberResult.Success(repository.allNumbers())
@@ -34,6 +31,21 @@ interface NumbersInteractor {
     }
 }
 
+interface NumbersInitialUseCase {
+    suspend fun init(): NumberResult
+}
+
+interface NumbersFactUseCase {
+    suspend fun fetchNumberFact(number: String): NumberResult
+}
+
+interface RandomNumberFactUseCase {
+    suspend fun fetchRandomNumberFact(): NumberResult
+}
+
+interface NumberDetailsUseCase {
+    fun saveDetails(details: String)
+}
 
 interface HandleRequest {
 

@@ -2,28 +2,24 @@ package com.ekzak.numberfact.presentation.numbers
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.ekzak.numberfact.R
-import com.ekzak.numberfact.domain.NumbersInteractor
+import com.ekzak.numberfact.domain.NumberDetailsUseCase
+import com.ekzak.numberfact.presentation.main.BaseViewModel
 import com.ekzak.numberfact.presentation.main.Init
-import com.ekzak.numberfact.presentation.main.ManageResources
 import com.ekzak.numberfact.presentation.main.NavigationCommunication
 import com.ekzak.numberfact.presentation.main.NavigationStrategy
 import com.ekzak.numberfact.presentation.main.Screen
+import com.ekzak.numberfact.presentation.main.UiFeature
 
-interface NumbersViewModel : Init, ObserveNumbers, FetchNumbers, ClearError {
-
-    fun showFact(number: NumberUi)
+interface NumbersViewModel : Init, ObserveNumbers, FetchNumbers, ClearError, ShowDetails {
 
     class Base(
+        dispatchersList: DispatchersList,
+        private val initial: UiFeature,
+        private val numberFact: NumbersFactFeature,
+        private val randomNumberFact: RandomNumberFactFeature,
+        private val showDetails: ShowDetails,
         private val communications: NumbersCommunications,
-        private val interactor: NumbersInteractor,
-        private val manageResources: ManageResources,
-        private val handleResult: HandleNumbersRequest,
-        private val navigationCommunication: NavigationCommunication.Mutate,
-        private val detailsMapper: NumberUi.Mapper<String>,
-    ) : ViewModel(), NumbersViewModel {
+    ) : BaseViewModel(dispatchersList), NumbersViewModel {
 
         override fun observeProgress(owner: LifecycleOwner, observer: Observer<Boolean>) =
             communications.observeProgress(owner, observer)
@@ -35,44 +31,45 @@ interface NumbersViewModel : Init, ObserveNumbers, FetchNumbers, ClearError {
             communications.observeNumbersList(owner, observer)
 
         override fun init(isFirstRun: Boolean) {
-            if (isFirstRun) {
-                handleResult.handle(viewModelScope) {
-                    interactor.init()
-                }
-            }
+            if (isFirstRun) initial.handle(this)
         }
 
         override fun fetchRandomNumberFact() {
-            handleResult.handle(viewModelScope) {
-                interactor.fetchRandomNumberFact()
-            }
+            randomNumberFact.handle(this)
         }
 
         override fun fetchNumberFact(number: String) {
-            if (number.isEmpty()) {
-                communications.showState(UiState.ShowError(manageResources.string(R.string.empty_number_error_message)))
-            } else {
-                handleResult.handle(viewModelScope) {
-                    interactor.fetchNumberFact(number)
-                }
-            }
+            numberFact.number(number).handle(this)
         }
 
         override fun clearError() {
             communications.showState(UiState.ClearError)
         }
 
-        override fun showFact(number: NumberUi) {
-            val details = number.map(detailsMapper)
-            interactor.saveDetails(details)
-            navigationCommunication.map(NavigationStrategy.Add(Screen.Details))
-        }
+        override fun showDetails(number: NumberUi) = showDetails.showDetails(number)
     }
 }
 
 interface FetchNumbers {
     fun fetchRandomNumberFact()
     fun fetchNumberFact(number: String)
+}
+
+interface ShowDetails {
+    fun showDetails(number: NumberUi)
+
+    class Base(
+        private val useCase: NumberDetailsUseCase,
+        private val navigationCommunication: NavigationCommunication.Mutate,
+        private val detailsMapper: NumberUi.Mapper<String>,
+    ) : ShowDetails {
+        override fun showDetails(number: NumberUi) {
+            val details = number.map(detailsMapper)
+            useCase.saveDetails(details)
+            navigationCommunication.map(NavigationStrategy.Add(Screen.Details))
+        }
+
+    }
 }
 
 interface ClearError {

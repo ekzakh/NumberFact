@@ -36,19 +36,20 @@ class NumbersViewModelTest : BaseTest() {
         interactor = TestNumbersInteractor()
         manageResources = TestManageResources()
         dispatchersList = TestDispatchersList()
-        val mapper = TestUiMapper()
+        val detailsMapper = TestUiMapper()
+        val resultMapper = NumberResultMapper(communications, NumberUiMapper())
         handleNumbersRequest = HandleNumbersRequest.Base(
             dispatchersList,
             communications,
             NumberResultMapper(communications, NumberUiMapper())
         )
         viewModel = NumbersViewModel.Base(
-            communications,
-            interactor,
-            manageResources,
-            handleNumbersRequest,
-            navigation,
-            mapper
+            dispatchersList,
+            NumbersInitialFeature(communications, resultMapper, interactor),
+            NumbersFactFeature.Base(communications, resultMapper, interactor, manageResources),
+            RandomNumberFactFeature(communications, resultMapper, interactor),
+            ShowDetails.Base(interactor, navigation, detailsMapper),
+            communications
         )
         Dispatchers.setMain(UnconfinedTestDispatcher())
     }
@@ -130,7 +131,16 @@ class NumbersViewModelTest : BaseTest() {
     @Test
     fun `test about some number`() = runTest {
 
-        interactor.changeExpectedResult(NumberResult.Success(listOf(NumberFact("89", "Fact about 89"))))
+        interactor.changeExpectedResult(
+            NumberResult.Success(
+                listOf(
+                    NumberFact(
+                        "89",
+                        "Fact about 89"
+                    )
+                )
+            )
+        )
         viewModel.fetchNumberFact("89")
         //show progress
         assertEquals(true, communications.progressCalledList[0])
@@ -159,7 +169,7 @@ class NumbersViewModelTest : BaseTest() {
 
     @Test
     fun `test navigation show details`() {
-        viewModel.showFact(NumberUi("0", "fact"))
+        viewModel.showDetails(NumberUi("0", "fact"))
         assertEquals("0 fact", interactor.details)
         assertEquals(NavigationStrategy.Add(Screen.Details), navigation.strategy)
     }
@@ -218,7 +228,7 @@ class NumbersViewModelTest : BaseTest() {
         override fun ui(): CoroutineDispatcher = dispatcher
     }
 
-    private class TestUiMapper: NumberUi.Mapper<String> {
+    private class TestUiMapper : NumberUi.Mapper<String> {
         override fun map(number: String, fact: String): String = "$number $fact"
     }
 

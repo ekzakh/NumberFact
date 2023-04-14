@@ -12,14 +12,17 @@ import com.ekzak.numberfact.domain.HandleError
 import com.ekzak.numberfact.domain.HandleRequest
 import com.ekzak.numberfact.domain.NumbersInteractor
 import com.ekzak.numberfact.presentation.numbers.DetailsUi
-import com.ekzak.numberfact.presentation.numbers.HandleNumbersRequest
 import com.ekzak.numberfact.presentation.numbers.NumberResultMapper
 import com.ekzak.numberfact.presentation.numbers.NumberUiMapper
 import com.ekzak.numberfact.presentation.numbers.NumbersCommunications
+import com.ekzak.numberfact.presentation.numbers.NumbersFactFeature
+import com.ekzak.numberfact.presentation.numbers.NumbersInitialFeature
 import com.ekzak.numberfact.presentation.numbers.NumbersListCommunication
 import com.ekzak.numberfact.presentation.numbers.NumbersStateCommunication
 import com.ekzak.numberfact.presentation.numbers.NumbersViewModel
 import com.ekzak.numberfact.presentation.numbers.ProgressCommunication
+import com.ekzak.numberfact.presentation.numbers.RandomNumberFactFeature
+import com.ekzak.numberfact.presentation.numbers.ShowDetails
 import com.ekzak.numberfact.sl.main.Core
 import com.ekzak.numberfact.sl.main.Module
 
@@ -35,8 +38,10 @@ class NumbersModule(
             NumbersListCommunication.Base()
         )
         val resultMapper = NumberResultMapper(communications, NumberUiMapper())
-        val cacheDataSource = NumbersCacheDataSource.Base(core.provideDataBase().numbersDao(), NumberDataToCache())
+        val cacheDataSource =
+            NumbersCacheDataSource.Base(core.provideDataBase().numbersDao(), NumberDataToCache())
         val mapperToDomain = NumberDataToDomain()
+
         val repository = BaseNumbersRepository(
             NumbersCloudDataSource.Base(core.service(NumbersService::class.java)),
             cacheDataSource,
@@ -47,20 +52,21 @@ class NumbersModule(
                 mapperToDomain
             )
         )
-        return NumbersViewModel.Base(
-            communications,
-            NumbersInteractor.Base(
-                repository,
-                HandleRequest.Base(
-                    HandleError.Base(core),
-                    repository
-                ),
-                core.provideFactDetails()
+        val interactor = NumbersInteractor.Base(
+            repository,
+            HandleRequest.Base(
+                HandleError.Base(core),
+                repository
             ),
-            core,
-            HandleNumbersRequest.Base(core.provideDispatchers(), communications, resultMapper),
-            core.provideNavigation(),
-            DetailsUi()
+            core.provideFactDetails()
+        )
+        return NumbersViewModel.Base(
+            core.provideDispatchers(),
+            NumbersInitialFeature(communications, resultMapper, interactor),
+            NumbersFactFeature.Base(communications, resultMapper, interactor, core),
+            RandomNumberFactFeature(communications, resultMapper, interactor),
+            ShowDetails.Base(interactor, core.provideNavigation(), DetailsUi()),
+            communications
         )
     }
 }

@@ -22,7 +22,7 @@ class NumbersFragment : BaseFragment<NumbersViewModel.Base>(R.layout.fragment_nu
         super.onViewCreated(view, savedInstanceState)
         val adapter = NumbersAdapter(object : ClickListener {
             override fun click(item: NumberUi) {
-                viewModel.showFact(item)
+                viewModel.showDetails(item)
             }
         })
         binding.recycler.adapter = adapter
